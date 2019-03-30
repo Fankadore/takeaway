@@ -1,31 +1,29 @@
 {
   "name": "takeaway",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "leaflet": "^1.4.0",
-    "react": "^16.8.5",
-    "react-dom": "^16.8.5",
-    "react-router-dom": "^5.0.0",
-    "react-scripts": "2.1.8",
-    "react-transition-group": "^2.7.0"
-  },
+  "version": "1.0.0",
+  "description": "MERN stack app for a takeaway",
+  "main": "server.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "server": "node server.js",
+		"client": "npm start --prefix client",
+		"start": "concurrently \"npm run server\" \"npm run client\""
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fankadore/takeaway.git"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
+  "author": "Ruaidhri MacKenzie",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Fankadore/takeaway/issues"
+  },
+  "homepage": "https://github.com/Fankadore/takeaway#readme",
+  "dependencies": {
+    "concurrently": "^4.1.0",
+    "express": "^4.16.4",
+    "mongoose": "^5.4.20"
+  },
   "devDependencies": {
-    "node-sass": "^4.11.0"
+    "nodemon": "^1.18.10"
   }
 }
