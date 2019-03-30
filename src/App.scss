@@ -1,0 +1,83 @@
+@import 'variables.scss';
+
+.App {
+	min-height: 100vh;
+	display: grid;
+	grid-template-rows: auto auto 1fr auto;
+	grid-template-areas:
+		"header"
+		"nav"
+		"main"
+		"footer";
+}
+
+.header {
+	grid-area: header;
+	background-image: linear-gradient($brand1, $brand2);
+
+	&__title {
+		margin-top: 1rem;
+		color: $light;
+		text-align: center;
+	}
+}
+
+.nav {
+	grid-area: nav;
+	position: sticky;
+  top: 0;
+	background-color: $brand2;
+	box-shadow: 0 8px 6px -6px black;
+	border-radius: 0 0 5px 5px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	&__link {
+		margin: 0.25rem 1rem;
+		color: $light;
+		text-decoration: none;
+		
+		&--active {
+			font-weight: bold;
+			font-size: larger;
+		}
+	}
+}
+
+.main {
+	grid-area: main;
+	background-color: $light;
+	color: $dark;
+	padding: 0.5rem;
+
+	&__title {
+		text-align: center;
+	}
+	
+	&__map {
+		height: 300px;
+	}
+
+	&__list-item {
+		margin: 0.5rem 0;
+		padding: 0.25rem;
+		text-align: center;
+		background-color: #fff;
+		border: 1px solid #000;
+	}
+}
+
+
+.footer {
+	grid-area: footer;
+	background-color: $brand1;
+	border-radius: 50% 50% 0 0 / 10% 10% 0 0;
+
+	&__copyright {
+		margin: 0.5rem;
+		color: $light;
+		text-align: center;
+		font-size: smaller;
+	}
+}
