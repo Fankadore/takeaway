@@ -4,9 +4,10 @@
   "description": "MERN stack app for a takeaway",
   "main": "server.js",
   "scripts": {
-    "server": "node server.js",
+		"start": "node server.js",
+    "server": "nodemon server.js",
 		"client": "npm start --prefix client",
-		"start": "concurrently \"npm run server\" \"npm run client\""
+		"dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "repository": {
     "type": "git",
