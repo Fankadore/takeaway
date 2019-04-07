@@ -1,0 +1,17 @@
+@import '../variables.scss';
+
+.view-map {
+	grid-area: main;
+	background-color: $light;
+	color: $dark;
+	padding: 0.5rem;
+	
+	&__address {
+		text-align: center;
+		margin: 0.25rem;
+	}
+
+	&__map {
+		height: 300px;
+	}
+}

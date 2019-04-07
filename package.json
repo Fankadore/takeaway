@@ -4,10 +4,10 @@
   "description": "MERN stack app for a takeaway",
   "main": "server.js",
   "scripts": {
-		"start": "node server.js",
+    "start": "node server.js",
     "server": "nodemon server.js",
-		"client": "npm start --prefix client",
-		"dev": "concurrently \"npm run server\" \"npm run client\""
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Fankadore/takeaway#readme",
   "dependencies": {
+    "body-parser": "^1.18.3",
     "concurrently": "^4.1.0",
     "express": "^4.16.4",
     "mongoose": "^5.4.20"

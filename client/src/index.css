@@ -8,6 +8,10 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
+body.no-scroll {
+	overflow: hidden;
+}
+
 ul {
 	list-style-type: none;
 }

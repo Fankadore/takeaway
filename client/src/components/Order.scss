@@ -1,0 +1,12 @@
+@import '../variables.scss';
+
+.order {
+	grid-area: main;
+	background-color: $light;
+	color: $dark;
+	padding: 0.5rem;
+
+	&__title {
+		text-align: center;
+	}
+}

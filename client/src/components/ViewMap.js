@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import L from 'leaflet';
+import './ViewMap.scss';
 
 export class ViewMap extends Component {
 	componentDidMount() {
@@ -18,9 +19,11 @@ export class ViewMap extends Component {
 
 	render() {
 		return (
-			<main className="main">
-				<h1 className="main__title">Map</h1>
-				<div className="main__map" id="mapid"></div>
+			<main className="view-map">
+				<p className="view-map__address">{this.props.address.street}</p>
+				<p className="view-map__address">{this.props.address.city}</p>
+				<p className="view-map__address">{this.props.address.postcode}</p>
+				<div className="view-map__map" id="mapid"></div>
 		</main>
 		)
 	}

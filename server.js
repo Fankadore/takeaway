@@ -1,7 +1,22 @@
 const express = require('express');
-const app = express();
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const keys = require('./keys.js');
+const corsHeaders = require('./middleware/corsHeaders.js');
+const dishRoutes = require('./routes/dishes.js');
+const accountRoutes = require('./routes/accounts.js');
+const orderRoutes = require('./routes/orders.js');
 const port = process.env.PORT || 2000;
 
-app.use('/', express.static(__dirname + '/client'));
+const app = express();
 
-app.listen(port, () => console.log("Server listening on port " + port));
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+app.use(corsHeaders);
+
+app.use('/dish', dishRoutes);
+app.use('/account', accountRoutes);
+app.use('/order', orderRoutes);
+
+mongoose.connect(`mongodb://${keys.mongo.user}:${keys.mongo.pass}@ds229186.mlab.com:29186/takeaway`, {useNewUrlParser: true});
+app.listen(port, () => console.log(`Server listening on port ${port}`));

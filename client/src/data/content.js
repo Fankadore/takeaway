@@ -14,6 +14,7 @@ const content = {
 	menu: [
 		{
 			title: "Starters",
+			description: "These starters are all very tasty and come with a crusty roll.",
 			items: [
 				{
 					name: "Starter 1 with heaps of shit and extra stuff and a side of chips",
@@ -29,6 +30,7 @@ const content = {
 		},
 		{
 			title: "Mains",
+			description: "Blah Blah",
 			items: [
 				{
 					name: "Main 1",
@@ -44,6 +46,7 @@ const content = {
 		},
 		{
 			title: "Sides",
+			description: "Blah Blah",
 			items: [
 				{
 					name: "Chips",
@@ -59,6 +62,7 @@ const content = {
 		},
 		{
 			title: "Desserts",
+			description: "Blah Blah",
 			items: [
 				{
 					name: "Dessert 1",
@@ -74,6 +78,7 @@ const content = {
 		},
 		{
 			title: "Drinks",
+			description: "",
 			items: [
 				{
 					name: "Coca-Cola",

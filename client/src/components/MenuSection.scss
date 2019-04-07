@@ -1,7 +1,16 @@
 @import '../variables.scss';
 
-.menu {
-	&__title {
+.menu__section {
+	margin: 1rem;
+	padding-bottom: 1.5rem;
+	display: flex;
+	flex-wrap: wrap;
+	
+	background-color: #fff;
+	box-shadow: 3px 3px 5px 6px #ccc;
+	
+	&-title {
+		flex-basis: 100%;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -10,7 +19,7 @@
 			margin: auto;
 			text-align: center;
 		}
-
+		
 		&-spacer {
 			margin: 1rem;
 			visibility: hidden;
@@ -20,5 +29,10 @@
 			margin: 1rem;
 			color: $brand2;
 		}
+	}
+
+	&-description {
+		text-align: center;
+		margin: auto;
 	}
 }
