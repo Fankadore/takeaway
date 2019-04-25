@@ -1,0 +1,33 @@
+@import '../../variables.scss';
+
+.spinner {
+	width: 4rem;
+	height: 4rem;
+	background-color: $brand1;
+	background-image: linear-gradient($brand1, $brand2);
+	border-radius: 50%;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	
+	&__text {
+		animation-name: spin;
+		animation-duration: 1250ms;
+		animation-iteration-count: infinite;
+		animation-timing-function: ease-in-out;
+		
+		font-family: monospace;
+		color: #fff;
+	}
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	
+	100% {
+		transform: rotate(360deg);
+	}
+}

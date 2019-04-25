@@ -1,0 +1,16 @@
+@import '../../variables.scss';
+
+.find-us {
+	grid-area: main;
+	background-color: $light;
+	color: $dark;
+	padding: 0.5rem;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+
+	&__map {
+		height: 300px;
+	}
+}

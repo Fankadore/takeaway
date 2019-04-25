@@ -7,8 +7,10 @@
     "leaflet": "^1.4.0",
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
+    "react-number-format": "^4.0.7",
     "react-router-dom": "^5.0.0",
     "react-scripts": "2.1.8",
+    "react-textarea-autosize": "^7.1.0",
     "react-transition-group": "^2.7.0"
   },
   "scripts": {

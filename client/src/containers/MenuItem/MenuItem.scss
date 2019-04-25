@@ -1,0 +1,38 @@
+@import '../../variables.scss';
+
+.menu__item {
+	display: grid;
+	margin: 0 0.5rem 0.5rem;
+	padding-top: 0.5rem;
+	border-top: 1px solid #ddd;
+
+	grid-template-columns: 1fr auto 2rem;
+	grid-gap: 0.5rem 0.25rem;
+	grid-template-areas:
+	"name price button"
+	"desc desc ."
+	"confirm confirm confirm";
+}
+
+#item-name {
+	grid-area: name;
+	font-weight: bold;
+}
+
+#item-description {
+	grid-area: desc;
+	font-size: smaller;
+}
+
+#item-price {
+	grid-area: price;
+
+	&-value,
+	&-currency {
+		font-size: smaller;
+	}
+}
+
+#item-confirm {
+	grid-area: confirm;
+}

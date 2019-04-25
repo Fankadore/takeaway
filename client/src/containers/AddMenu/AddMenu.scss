@@ -1,0 +1,58 @@
+@import '../../variables.scss';
+
+.add-menu {
+	display: grid;
+	grid-template-rows: 0.5fr auto auto 0.5fr auto auto 1fr 0.5fr;
+	grid-gap: 0.5rem;
+	grid-template-areas:
+		"."
+		"name"
+		"desc"
+		"."
+		"button"
+		"text"
+		"popup"
+		".";
+
+	&--flex {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	&__text {
+		grid-area: text;
+		text-align: center;
+		font-weight: bold;
+		margin: auto;
+	}
+
+	&__icon {
+		grid-area: button;
+		text-align: center;
+		font-size: 3rem;
+		color: $brand2;
+		margin: auto;
+	}
+
+	&__not-found {
+		text-align: center;
+	}
+}
+
+#add-menu-name {
+	grid-area: name;
+	text-align: center;
+	font-size: larger;
+	font-weight: bold;
+}
+
+#add-menu-description {
+	grid-area: desc;
+	text-align: center;
+}
+
+#add-menu-pop-up {
+	grid-area: popup; 
+}

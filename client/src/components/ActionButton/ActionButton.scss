@@ -1,0 +1,8 @@
+@import '../../variables.scss';
+
+.action-button {
+	grid-area: button;
+	margin: auto;
+	text-align: center;
+	color: $brand2;
+}

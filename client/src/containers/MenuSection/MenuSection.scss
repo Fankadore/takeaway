@@ -1,0 +1,61 @@
+@import '../../variables.scss';
+
+.menu__section {
+	margin: 0 1rem 2rem;
+	display: flex;
+	flex-direction: column;
+	align-content: center;
+	background-color: #fff;
+	box-shadow: 3px 3px 5px 6px #ccc;
+
+	&:last-of-type {
+		margin-bottom: 1rem;
+	}
+
+	&-header {
+		padding: 0.5rem;
+		display: grid;
+		grid-template-columns: 2rem 1fr 2rem;
+		grid-template-areas:
+			"edit			name		move"
+			".				desc		."
+			"confirm	confirm	confirm";
+	}
+
+	&-footer {
+		border-top: 1px solid #ddd;
+
+		padding: 0.5rem;
+		display: grid;
+		grid-template-columns: 2rem 1fr 2rem;
+		grid-template-areas:
+			"remove . add";
+	}
+}
+
+#section-edit {
+	grid-area: edit;
+}
+#section-remove {
+	grid-area: remove;
+}
+#section-add {
+	grid-area: add;
+}
+#section-move {
+	grid-area: move;
+}
+#section-confirm {
+	grid-area: confirm;
+}
+#section-name {
+	grid-area: name;
+	text-align: center;
+	font-size: larger;
+	font-weight: bold;
+}
+#section-description {
+	grid-area: desc;
+	text-align: center;
+	font-size: smaller;
+}

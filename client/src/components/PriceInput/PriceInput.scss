@@ -1,0 +1,22 @@
+@import '../../variables.scss';
+
+.price-input {
+	width: 100%;
+	margin: auto;
+	display: flex;
+	justify-content: flex-end;
+	
+	&__input {
+		width: 26px;
+		font-family: 'Open Sans', sans-serif;
+		text-align: right;
+		border: none;
+		background: none;
+	}
+	
+	&__currency,
+	&__display {
+		text-align: right;
+		cursor: default;
+	}
+}

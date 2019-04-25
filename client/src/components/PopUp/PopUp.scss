@@ -1,0 +1,30 @@
+@import '../../variables.scss';
+
+.pop-up {
+	padding: 0.5rem;
+	margin: 0.5rem;
+	background-color: $fail;
+	color: #fff;
+	text-align: center;
+	animation-name: appear;
+	animation-duration: 4s;
+	animation-timing-function: ease-in-out;
+	visibility: hidden;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+@keyframes appear {
+	0% {
+		opacity: 0;
+		visibility: visible;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}

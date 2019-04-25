@@ -1,0 +1,15 @@
+@import '../../variables.scss';
+
+.text-input {
+	font-family: 'Open Sans', sans-serif;
+	font-size: 1rem;
+	font-weight: 0;
+	
+	&--input {
+		border: none;
+		background: none;
+	}
+	&--display {
+		cursor: default;
+	}
+}

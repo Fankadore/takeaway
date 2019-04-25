@@ -1,0 +1,17 @@
+@import '../../variables.scss';
+
+.address {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background-color: #fff;
+	border: 1px solid #000;
+	margin: 0.5rem auto 1rem;
+	padding: 0.5rem;
+	
+	&__item {
+		text-align: center;
+		margin: 0.25rem;
+	}
+}
