@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const keys = require('./keys.js');
 const corsHeaders = require('./middleware/corsHeaders.js');
-const dishRoutes = require('./routes/dishes.js');
+const menuRoutes = require('./routes/menuRoutes.js');
 const accountRoutes = require('./routes/accounts.js');
 const orderRoutes = require('./routes/orders.js');
 const port = process.env.PORT || 2000;
@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(corsHeaders);
 
-app.use('/dish', dishRoutes);
+app.use('/menu', menuRoutes);
 app.use('/account', accountRoutes);
 app.use('/order', orderRoutes);
 
