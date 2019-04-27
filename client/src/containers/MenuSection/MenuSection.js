@@ -118,13 +118,23 @@ export class MenuSection extends Component {
 		// Update menu section
 	};
 
+	onDragStart = (e) => {
+		const parent = e.target.parentNode;
+		e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("id", parent.id);
+    e.dataTransfer.setData("html", parent);
+		e.dataTransfer.setDragImage(parent, 0, 0);
+	};
 	onDragOver = (e) => {
 		e.preventDefault();
-		console.log(e);
 	};
 	onDrop = (e) => {
+		const { moveSection } = this.props;
 		e.preventDefault();
-		console.log(e);
+		const sectionId = e.dataTransfer.getData("id");
+		const startIndex = parseInt(sectionId.slice(8));
+		const endIndex = parseInt(e.target.parentNode.id.slice(8));
+		moveSection(startIndex, endIndex);
 	};
 
 	// Handle Inputs
@@ -133,11 +143,11 @@ export class MenuSection extends Component {
 
 	// Render
 	renderHeader = () => {
-		const { draggable, adminMode, forceEdit } = this.props;
+		const { id, draggable, adminMode, forceEdit } = this.props;
 		const { editMode, name, description } = this.state;
 
 		return (
-			<header className="menu__section-header">
+			<header id={id + "-header"} className="menu__section-header">
 				<ActionButton id="section-edit" action="edit" callback={this.editSection} hide={(!adminMode || editMode || forceEdit)} />
 				<TextInput id="section-name" update={this.changeName} value={name} placeholder="Name..."  edit={adminMode && (editMode || forceEdit)} />
 				<TextInput id="section-description" update={this.changeDescription} value={description} placeholder="Description..."  edit={adminMode && (editMode || forceEdit)} />
@@ -160,11 +170,11 @@ export class MenuSection extends Component {
 		);
 	};
 	render() {
-		const { updateMenu, addToOrder, section, adminMode, forceEdit } = this.props;
+		const { id, updateMenu, addToOrder, section, adminMode, forceEdit } = this.props;
 		const { editMode, newItem } = this.state;
 
 		return (
-			<section className="menu__section" onDragOver={this.onDragOver} onDrop={this.onDrop}>
+			<section id={id} className="menu__section" onDragOver={this.onDragOver} onDrop={this.onDrop}>
 				{this.renderHeader()}
 				{(section.items) ? section.items.map((item, index) => <MenuItem key={index} updateMenu={updateMenu} addToOrder={addToOrder} cancelAddItem={this.cancelAddItem} item={item} sectionId={section._id} adminMode={adminMode} sectionEdit={editMode || forceEdit} forceEdit={false} />) : null}
 				{(adminMode && newItem) ? <MenuItem cancelAddItem={this.cancelAddItem} updateMenu={updateMenu} item={{}} sectionId={section._id} adminMode={adminMode} sectionEdit={editMode || forceEdit} forceEdit /> : null}

@@ -80,7 +80,8 @@ export class Menu extends Component {
 		this.setState({newSection: false});
 	};
 	moveSection = (startIndex, endIndex) => {
-		const { sections } = this.props.menu;
+		const { updateMenu, menu } = this.props
+		const { sections } = menu;
 		
 		if (startIndex === endIndex) return;
 		
@@ -103,8 +104,9 @@ export class Menu extends Component {
 			}
 		}
 
-		console.log(sections);
-		// Update menu
+		axios.put('http://localhost:2000/menu/' + menu._id, {sections})
+		.then(result => updateMenu())
+		.catch(err => console.log(err));
 	};
 
 	// Handle Inputs
@@ -146,7 +148,7 @@ export class Menu extends Component {
 		return (
 			<main className="menu">
 				{this.renderHeader()}
-				{(menu.sections) ? menu.sections.map((section, index) => <MenuSection key={index} draggable={adminMode && editMode} updateMenu={updateMenu} cancelAddSection={this.cancelAddSection} section={section} menuId={menu._id} adminMode={adminMode} />) : null}
+				{(menu.sections) ? menu.sections.map((section, index) => <MenuSection id={"section-" + index} key={index} draggable={adminMode && editMode} updateMenu={updateMenu} cancelAddSection={this.cancelAddSection} moveSection={this.moveSection} section={section} menuId={menu._id} adminMode={adminMode} />) : null}
 				{(adminMode && newSection) ? <MenuSection updateMenu={updateMenu} cancelAddSection={this.cancelAddSection} section={{}} menuId={menu._id} adminMode={adminMode} forceEdit /> : null}
 				{this.renderFooter()}
 			</main>
