@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useContext } from 'react';
 import axios from 'axios';
 import './MenuSection.scss';
 
@@ -9,43 +9,27 @@ import TextInput from '../../components/TextInput/TextInput';
 import ActionButton from '../../components/ActionButton/ActionButton';
 import OpenClose from '../../components/OpenClose/OpenClose';
 
-export class MenuSection extends Component {
-	constructor(props) {
-		super(props);
-		const { name = "", description = "" } = props.section;
+import MenuContext from '../../context/MenuContext';
 
-		this.state = {
-			editMode: false,
-			newItem: false,
-			name,
-			description,
-		};
-	}
+function MenuSection(props) {
+	const { id, index, section, parentId, parentEditMode } = props;
+	const context = useContext(MenuContext);
+	const { admin, menu, editId, newId, name, description } = context;
+	const { updateMenus, createPopup, addResource, editResource, cancelEdit, moveResource, moveItemToSection, handleName, handleDescription } = context;
 
-	editSection = () => {
-		const { adminMode } = this.props;
-		if (!adminMode) return;
+	const editMode = (admin && (!section._id || editId === section._id));
+	const newItem = (newId === section._id);
 
-		this.setState({editMode: true});
+	const editSection = () => {
+		editResource(section);
 	};
-	cancelEditSection = () => {
-		const { adminMode, cancelAddSection, section } = this.props;
-		const { name, description } = section;
-		if (!adminMode) return;
-		this.setState({editMode: false, name, description});
-		if (!section._id) cancelAddSection();
-	};
-	saveEditSection = () => {
-		const { adminMode, updateMenu, cancelAddSection, section, menuId } = this.props;
-		const { name, description } = this.state;
-		if (!adminMode) return;
+	const saveSection = () => {
+		if (!admin) return;
+
 		if (!name) {
-			console.log("Name is required.");
+			createPopup("Name is required.");
 			return;
 		}
-
-		this.setState({editMode: false, name, description});
-		cancelAddSection();
 
 		if (section._id) {
 			// Update Section
@@ -53,135 +37,121 @@ export class MenuSection extends Component {
 				name,
 				description,
 			})
-			.then(result => updateMenu())
+			.then(result => updateMenus())
 			.catch(err => console.log(err));
 		}
 		else {
 			// Add Section
 			axios.post('http://localhost:2000/menu/section', {
-				menuId,
+				menuId: parentId,
 				name,
 				description,
 			})
-			.then(result => updateMenu())
+			.then(result => updateMenus())
 			.catch(err => console.log(err));
 		}
-	};
-	removeSection = () => {
-		let confirmed = window.confirm("Are you sure you want to remove this section?\nThis will also remove all items in the section.");
-		if (!confirmed) return;
-		
-		const { updateMenu, section } = this.props;
-		this.cancelEditSection();
 
+		cancelEdit();
+	};
+	const removeSection = () => {
+		
 		if (section._id) {
+			let confirmed = window.confirm("Are you sure you want to remove this section?\nThis will also remove all items in the section.");
+			if (!confirmed) return;
+			
 			axios.delete('http://localhost:2000/menu/section/' + section._id)
-			.then(result => updateMenu())
+			.then(result => updateMenus())
 			.catch(err => console.log(err));
 		}
+
+		cancelEdit();
+	};
+	const moveSection = (startIndex, endIndex) => {
+		const sections = moveResource(menu.sections, startIndex, endIndex);
+
+		axios.put('http://localhost:2000/menu/' + parentId, {sections})
+		.then(result => updateMenus())
+		.catch(err => console.log(err));
+	};
+	const addItem = () => {
+		addResource(section._id);
 	};
 
-	// Callbacks
-	addItem = () => {
-		if (!this.props.adminMode) return;
-		this.setState({newItem: true});
-	};
-	cancelAddItem = () => {
-		if (!this.props.adminMode) return;
-		this.setState({newItem: false});
-	};
-	moveItem = (startIndex, endIndex) => {
-		const { items } = this.props.section;
-		
-		if (startIndex === endIndex) return;
-		
-		if (startIndex < endIndex) {
-			if (startIndex < 0 || endIndex <= 0) return;
-			while (startIndex < endIndex) {
-				const temp = items[startIndex + 1];
-				items[startIndex + 1] = items[startIndex];
-				items[startIndex] = temp;
-				startIndex++;
-			}
-		}
-		else if (startIndex > endIndex) {
-			if (startIndex <= 0 || endIndex < 0) return;
-			while (startIndex > endIndex) {
-				const temp = items[startIndex - 1];
-				items[startIndex - 1] = items[startIndex];
-				items[startIndex] = temp;
-				startIndex--;
-			}
-		}
-
-		console.log(items);
-		// Update menu section
-	};
-
-	onDragStart = (e) => {
+	const onDragStart = (e) => {
 		const parent = e.target.parentNode;
 		e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("id", parent.id);
+    e.dataTransfer.setData("index", index);
+    e.dataTransfer.setData("type", "section");
     e.dataTransfer.setData("html", parent);
 		e.dataTransfer.setDragImage(parent, 0, 0);
 	};
-	onDragOver = (e) => {
+	const onDragOver = (e) => {
 		e.preventDefault();
 	};
-	onDrop = (e) => {
-		const { moveSection } = this.props;
+	const onDrop = (e) => {
 		e.preventDefault();
-		const sectionId = e.dataTransfer.getData("id");
-		const startIndex = parseInt(sectionId.slice(8));
-		const endIndex = parseInt(e.target.parentNode.id.slice(8));
-		moveSection(startIndex, endIndex);
+		e.target.classList.remove("drag-over");
+		const type = e.dataTransfer.getData("type");
+		
+		if (type === "section") {
+			const startIndex = e.dataTransfer.getData("index");
+			const endIndex = index;
+			moveSection(startIndex, endIndex);
+		}
+		else if (type === "item") {
+			const sectionId = e.dataTransfer.getData("parentId");
+			if (sectionId !== section._id) {
+				const itemId = e.dataTransfer.getData("id");
+				moveItemToSection(itemId, sectionId, section._id);
+			}
+		}
 	};
-
-	// Handle Inputs
-	changeName = (e) => this.setState({name: e.target.value});
-	changeDescription = (e) => this.setState({description: e.target.value});
 
 	// Render
-	renderHeader = () => {
-		const { id, draggable, adminMode, forceEdit } = this.props;
-		const { editMode, name, description } = this.state;
+	const renderHeader = () => {
+		const nameInput = (editMode) ? name : section.name;
+		const descriptionInput = (editMode) ? description : section.description;
 
 		return (
-			<header id={id + "-header"} className="menu__section-header">
-				<ActionButton id="section-edit" action="edit" callback={this.editSection} hide={(!adminMode || editMode || forceEdit)} />
-				<TextInput id="section-name" update={this.changeName} value={name} placeholder="Name..."  edit={adminMode && (editMode || forceEdit)} />
-				<TextInput id="section-description" update={this.changeDescription} value={description} placeholder="Description..."  edit={adminMode && (editMode || forceEdit)} />
-				<ActionButton id="section-move" action="move" callback={this.onDragStart} hide={!draggable} />
-				<ConfirmBar id="section-confirm" cancel={this.cancelEditSection} confirm={this.saveEditSection} hide={(!adminMode || (!editMode && !forceEdit))} />
+			<header className={id + "-header"}>
+				<ActionButton id={id + "-edit"} action="edit" callback={editSection} hide={(!admin || editMode || parentEditMode)} />
+				<TextInput id={id + "-name"} update={handleName} value={nameInput} placeholder="Name..."  edit={editMode} />
+				<TextInput id={id + "-description"} update={handleDescription} value={descriptionInput} placeholder="Description..."  edit={editMode} />
+				<ActionButton id={id + "-move"} action="move" callback={onDragStart} hide={!parentEditMode} />
+				<ConfirmBar id={id + "-confirm"} cancel={cancelEdit} confirm={saveSection} hide={!editMode} />
 			</header>
 		);
 	};
-	renderFooter = () => {
-		const { adminMode, forceEdit} = this.props;
-		const { editMode, newItem } = this.state;
-
-		if (!adminMode) return null;
-
-		return (
-			<footer className="menu__section-footer">
-				<ActionButton id="section-remove" action="remove" callback={this.removeSection} hide={(!editMode && !forceEdit)} />
-				<OpenClose id="section-add" close={this.cancelAddItem} open={this.addItem} isOpen={newItem} hide={(editMode || forceEdit)} />
-			</footer>
-		);
+	const renderItems = () => {
+		if (section.items) return section.items.map((item, index) => <MenuItem key={index} index={index} id={id + "__item"} item={item} parentId={section._id} parentEditMode={editMode || parentEditMode} />)
+		else return null;
 	};
-	render() {
-		const { id, updateMenu, addToOrder, section, adminMode, forceEdit } = this.props;
-		const { editMode, newItem } = this.state;
+	const renderNewItem = () => {
+		if (admin && newItem) return <MenuItem id={id + "__item"} item={{}} parentId={section._id} />
+		else return null;
+	};
+	const renderFooter = () => {
+		if (!admin) return null;
 
-		return (
-			<section id={id} className="menu__section" onDragOver={this.onDragOver} onDrop={this.onDrop}>
-				{this.renderHeader()}
-				{(section.items) ? section.items.map((item, index) => <MenuItem key={index} updateMenu={updateMenu} addToOrder={addToOrder} cancelAddItem={this.cancelAddItem} item={item} sectionId={section._id} adminMode={adminMode} sectionEdit={editMode || forceEdit} forceEdit={false} />) : null}
-				{(adminMode && newItem) ? <MenuItem cancelAddItem={this.cancelAddItem} updateMenu={updateMenu} item={{}} sectionId={section._id} adminMode={adminMode} sectionEdit={editMode || forceEdit} forceEdit /> : null}
-				{this.renderFooter()}
-			</section>
-		);
-	}
+		if (!parentEditMode) {
+			return (
+				<footer className={id + "-footer"}>
+					<ActionButton id={id + "-remove"} action="remove" callback={removeSection} hide={!editMode} />
+					<OpenClose id={id + "-add"} close={cancelEdit} open={addItem} isOpen={newItem} hide={editMode} />
+				</footer>
+			);
+		}
+		else return null;
+	};
+
+	return (
+		<section className={id} onDragOver={onDragOver} onDrop={onDrop}>
+			{renderHeader()}
+			{renderItems()}
+			{renderNewItem()}
+			{renderFooter()}
+		</section>
+	);
 }
 
 export default MenuSection;
