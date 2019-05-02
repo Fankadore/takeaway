@@ -4,7 +4,7 @@
 	grid-area: main;
 	background-color: $light;
 	color: $dark;
-
+	
 	&--flex {
 		display: flex;
 		flex-direction: column;
@@ -12,7 +12,7 @@
 		align-items: center;
 	}
 
-	&__header {
+	&-header {
 		padding: 0.5rem;
 		display: grid;
 		grid-template-columns: 2rem 1fr 2rem;
@@ -21,36 +21,58 @@
 			".				desc		."
 			"confirm	confirm confirm";
 	}
-
-	&__footer {
+	&-footer {
 		padding: 0.5rem;
 		display: grid;
 		grid-template-columns: 2rem 1fr 2rem;
 		grid-template-areas:
 			"remove . add";
 	}
-}
+	
+	&-name {
+		grid-area: name;
+		text-align: center;
+		font-family: 'Open Sans', sans-serif;
+		font-size: x-large;
+		font-weight: bold;
+	}
+	&-description {
+		grid-area: desc;
+		text-align: center;
+		font-family: 'Open Sans', sans-serif;
+		font-size: small;
+	}
 
-#menu-edit {
-	grid-area: edit;
-}
-#menu-remove {
-	grid-area: remove;
-}
-#menu-add {
-	grid-area: add;
-}
-#menu-confirm {
-	grid-area: confirm;
-}
-#menu-name {
-	grid-area: name;
-	text-align: center;
-	font-size: larger;
-	font-weight: bold;
-}
-#menu-description {
-	grid-area: desc;
-	text-align: center;
-	font-size: smaller;
+	&-edit {
+		grid-area: edit;
+		color: $brand2;
+	}
+	&-remove {
+		grid-area: remove;
+		color: $brand2;
+	}
+	&-add {
+		grid-area: add;
+		color: $brand2;
+	}
+	&-confirm {
+		grid-area: confirm;
+		color: $brand2;
+		margin: 0.5rem;
+	}
+	
+	&-load {
+		background-color: $brand1;
+		background-image: linear-gradient($brand1, $brand2);
+		font-family: monospace;
+		color: #fff;
+	}
+
+	&-popup {
+		position: fixed;
+		top: 0;
+		width: 100%;
+		background-color: $fail;
+		color: #fff;
+	}
 }

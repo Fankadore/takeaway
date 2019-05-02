@@ -1,6 +1,6 @@
 @import '../../variables.scss';
 
-.menu__item {
+.menu__section__item {
 	display: grid;
 	margin: 0 0.5rem 0.5rem;
 	padding-top: 0.5rem;
@@ -12,27 +12,38 @@
 	"name price button"
 	"desc desc ."
 	"confirm confirm confirm";
-}
-
-#item-name {
-	grid-area: name;
-	font-weight: bold;
-}
-
-#item-description {
-	grid-area: desc;
-	font-size: smaller;
-}
-
-#item-price {
-	grid-area: price;
-
-	&-value,
-	&-currency {
-		font-size: smaller;
+	
+	&-name {
+		grid-area: name;
+		font-family: 'Open Sans', sans-serif;
+		font-size: medium;
+		font-weight: bold;
 	}
-}
-
-#item-confirm {
-	grid-area: confirm;
+	&-description {
+		grid-area: desc;
+		font-family: 'Open Sans', sans-serif;
+		font-size: small;
+	}
+	&-price {
+		grid-area: price;
+		
+		&-value,
+		&-currency {
+			font-family: 'Open Sans', sans-serif;
+			font-size: small;
+		}
+	}
+	
+	&-edit,
+	&-add,
+	&-remove,
+	&-move {
+		grid-area: button;
+		color: $brand2;
+	}
+	&-confirm {
+		grid-area: confirm;
+		color: $brand2;
+		margin: 0.5rem;
+	}
 }

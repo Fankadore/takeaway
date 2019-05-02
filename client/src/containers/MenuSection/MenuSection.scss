@@ -11,7 +11,7 @@
 	&:last-of-type {
 		margin-bottom: 1rem;
 	}
-
+	
 	&-header {
 		padding: 0.5rem;
 		display: grid;
@@ -21,7 +21,6 @@
 			".				desc		."
 			"confirm	confirm	confirm";
 	}
-
 	&-footer {
 		border-top: 1px solid #ddd;
 
@@ -31,31 +30,40 @@
 		grid-template-areas:
 			"remove . add";
 	}
-}
+	
+	&-name {
+		grid-area: name;
+		text-align: center;
+		font-family: 'Open Sans', sans-serif;
+		font-size: large;
+		font-weight: bold;
+	}
+	&-description {
+		grid-area: desc;
+		text-align: center;
+		font-family: 'Open Sans', sans-serif;
+		font-size: small;
+	}
 
-#section-edit {
-	grid-area: edit;
-}
-#section-remove {
-	grid-area: remove;
-}
-#section-add {
-	grid-area: add;
-}
-#section-move {
-	grid-area: move;
-}
-#section-confirm {
-	grid-area: confirm;
-}
-#section-name {
-	grid-area: name;
-	text-align: center;
-	font-size: larger;
-	font-weight: bold;
-}
-#section-description {
-	grid-area: desc;
-	text-align: center;
-	font-size: smaller;
+	&-edit {
+		grid-area: edit;
+		color: $brand2;
+	}
+	&-remove {
+		grid-area: remove;
+		color: $brand2;
+	}
+	&-add {
+		grid-area: add;
+		color: $brand2;
+	}
+	&-move {
+		grid-area: move;
+		color: $brand2;	
+	}
+	&-confirm {
+		grid-area: confirm;
+		color: $brand2;
+		margin: 0.5rem;
+	}
 }
