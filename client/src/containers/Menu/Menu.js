@@ -112,7 +112,7 @@ function Menu(props) {
 	else if (menus.length === 0) {
 		return (
 			<MenuContext.Provider value={{admin, name, description, popup, createPopup, updateMenus, handleName, handleDescription}}>
-				<AddMenu id={id} />
+				<AddMenu id={"add-" + id} />
 			</MenuContext.Provider>
 		);
 	}

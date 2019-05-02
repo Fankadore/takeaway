@@ -21,14 +21,14 @@
 		align-items: center;
 	}
 
-	&__text {
+	&-text {
 		grid-area: text;
 		text-align: center;
 		font-weight: bold;
 		margin: auto;
 	}
 
-	&__icon {
+	&-icon {
 		grid-area: button;
 		text-align: center;
 		font-size: 3rem;
@@ -36,23 +36,25 @@
 		margin: auto;
 	}
 
-	&__not-found {
+	&-not-found {
 		text-align: center;
 	}
-}
 
-#add-menu-name {
-	grid-area: name;
-	text-align: center;
-	font-size: larger;
-	font-weight: bold;
-}
-
-#add-menu-description {
-	grid-area: desc;
-	text-align: center;
-}
-
-#add-menu-pop-up {
-	grid-area: popup; 
+	&-name {
+		grid-area: name;
+		text-align: center;
+		font-family: 'Open sans', sans-serif;
+		font-size: large;
+		font-weight: bold;
+	}
+	
+	&-description {
+		grid-area: desc;
+		text-align: center;
+		font-family: 'Open sans', sans-serif;
+	}
+	
+	&-popup {
+		grid-area: popup; 
+	}
 }
