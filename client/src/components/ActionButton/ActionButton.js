@@ -8,13 +8,13 @@ function ActionButton(props) {
 
 	switch (action) {
 		case "remove":
-			return <span id={id} onClick={callback} className="action-button fas fa-trash-alt" />
+			return <span id={id} onClick={callback} className={id + " action-button fas fa-trash-alt"} />
 		case "move":
-			return <span id={id} onDragStart={(e) => callback(e)} className="action-button fas fa-crosshairs" draggable />
+			return <span id={id} onDragStart={(e) => callback(e)} className={id + " action-button fas fa-crosshairs"} draggable />
 		case "edit":
-			return <span id={id} onClick={callback} className="action-button fas fa-edit" />
+			return <span id={id} onClick={callback} className={id + " action-button fas fa-edit"} />
 		default:
-			return <span id={id} onClick={callback} className="action-button fas fa-plus-square" />
+			return <span id={id} onClick={callback} className={id + " action-button fas fa-plus-square"} />
 	}
 }
 

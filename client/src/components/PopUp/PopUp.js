@@ -1,5 +1,5 @@
 import React from 'react';
-import './PopUp.scss';
+import './Popup.scss';
 
 function PopUp(props) {
 	const { id, value } = props;
@@ -7,7 +7,7 @@ function PopUp(props) {
 	if (!value) return null;
 	
 	return (
-		<div id={id} className="pop-up">
+		<div id={id} className="popup">
 			{value}
 		</div>
 	);

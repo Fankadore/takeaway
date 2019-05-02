@@ -6,8 +6,8 @@ function Address(props) {
 	const addressItems = Object.keys(address).map(key => address[key]);
 
 	return (
-		<div id={id} className="address">
-			{addressItems.map((item, index) => <p key={index} className="address__item">{item}</p>)}
+		<div id={id} className={id + " address"}>
+			{addressItems.map((item, index) => <p key={index} className={id + "-item address-item"}>{item}</p>)}
 		</div>
 	);
 }

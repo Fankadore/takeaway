@@ -6,8 +6,8 @@ function Spinner(props) {
 	const textId = id + "-text";
 
 	return (
-		<div id={id} className="spinner">
-			<p id={textId} className="spinner__text">Loading</p>
+		<div id={id} className={id + " spinner"}>
+			<p id={textId} className={id + "-text spinner-text"}>Loading</p>
 		</div>
 	);
 }

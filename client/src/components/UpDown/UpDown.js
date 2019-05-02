@@ -2,12 +2,12 @@ import React from 'react';
 import './UpDown.scss';
 
 function UpDown(props) {
-	const { up, down } = props;
+	const { id, up, down } = props;
 
 	return (
-		<div className="up-down">
-			<span onClick={up} className="up-down__arrow fas fa-caret-up" />
-			<span onClick={down} className="up-down__arrow fas fa-caret-down" />
+		<div id={id} className={id + " up-down"}>
+			<span onClick={up} className={id + "-up up-down__arrow fas fa-caret-up"} />
+			<span onClick={down} className={id + "-down up-down__arrow fas fa-caret-down"} />
 		</div>
 	);
 }

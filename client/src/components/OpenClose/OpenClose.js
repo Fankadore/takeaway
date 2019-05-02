@@ -6,8 +6,8 @@ function OpenClose(props) {
 
 	if (hide) return null;
 	
-	if (isOpen) return <span id={id} onClick={close} className="open-close fas fa-minus" />
-	else return <span id={id} onClick={open} className="open-close fas fa-plus" />
+	if (isOpen) return <span id={id} onClick={close} className={id + " open-close fas fa-minus"} />
+	else return <span id={id} onClick={open} className={id + " open-close fas fa-plus"} />
 }
 
 export default OpenClose;
