@@ -1,16 +1,35 @@
 @import '../../variables.scss';
 
-.find-us {
+#find-us {
 	grid-area: main;
 	background-color: $light;
 	color: $dark;
 	padding: 0.5rem;
 
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
+	display: grid;
+	grid-template-areas:
+		"address"
+		"map";
+	
+	&__address {
+		grid-area: address;
+		background-image: radial-gradient($brand1, $brand2);
+		color: #fff;
+		margin: 0.5rem auto;
+		padding: 1.5rem;
+		border-radius: 50%;
+		font-weight: bold;
+
+		&-item {
+			margin: 0.2rem;
+		}
+	}
 
 	&__map {
+		grid-area: map;
 		height: 300px;
+		width: 300px;
+		margin: 0.5rem auto;
+		border: 3px solid $brand1;
 	}
 }
