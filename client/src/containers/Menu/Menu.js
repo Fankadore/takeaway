@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import axios from 'axios';
 import './Menu.scss';
 
@@ -12,93 +12,18 @@ import TextInput from '../../components/TextInput/TextInput';
 import Spinner from '../../components/Spinner/Spinner';
 import Popup from '../../components/Popup/Popup';
 
-import MenuContext from '../../context/MenuContext';
+import { menuContext } from '../../context/MenuContext';
 
-function Menu(props) {
-	const { id, admin, addToOrder } = props;
+const Menu = (props) => {
+	const { id, admin } = props;
+	const {state, dispatch, menu} = useContext(menuContext);
+	const { menus, selectedMenu, editId, newId, popup, name, description } = state;
 
-	const [menus, setMenus] = useState(null);
-	const [selectedMenu, setSelectedMenu] = useState(0);
-	const [editId, setEditId] = useState(null);
-	const [newId, setNewId] = useState(null);
+	useEffect(() => dispatch({ type: "UPDATE_MENUS" }), []);
 	
-	const [name, setName] = useState("");
-	const [description, setDescription] = useState("");
-	const [price, setPrice] = useState(0);
-
-	const [popup, setPopup] = useState("");
-	
-	// Fetch Data
-	const updateMenus = () => {
-		axios.get('http://localhost:2000/menu')
-		.then(res => setMenus(res.data))
-		.catch(err => console.log(err));
-	};
-
-	useEffect(updateMenus, []);
-
-	const handleName = (e) => setName(e.target.value);
-	const handleDescription = (e) => setDescription(e.target.value);
-	const handlePrice = (e) => {
-		let price = parseFloat(e.target.value);
-		if (isNaN(price) || price < 0) price = 0;
-		setPrice(price);
-	};
-
-	const editResource = (resource) => {
-		if (!admin) return;
-		
-		const {_id = null, name = "", description = "", price = ""} = resource;
-
-		setEditId(_id);
-		setNewId(null);
-		setName(name);
-		setDescription(description);
-		setPrice(price);
-	};
-	const cancelEdit = () => {
-		if (!admin) return;
-
-		setEditId(null);
-		setNewId(null);
-		setName("");
-		setDescription("");
-		setPrice(0);
-	};
-	const moveResource = (array, startIndex, endIndex) => {
-		startIndex = parseInt(startIndex);
-		endIndex = parseInt(endIndex);
-
-		if (startIndex < endIndex) {
-			if (startIndex < 0 || endIndex <= 0) return;
-			while (startIndex < endIndex) {
-				
-				const temp = array[startIndex + 1];
-				array[startIndex + 1] = array[startIndex];
-				array[startIndex] = temp;
-				startIndex++;
-			}
-		}
-		else if (startIndex > endIndex) {
-			if (startIndex <= 0 || endIndex < 0) return;
-			while (startIndex > endIndex) {
-				const temp = array[startIndex - 1];
-				array[startIndex - 1] = array[startIndex];
-				array[startIndex] = temp;
-				startIndex--;
-			}
-		}
-
-		return array;
-	};
-	const addResource = (resourceId) => {
-		if (!admin) return;
-		cancelEdit();
-		setNewId(resourceId);
-	};
 	const createPopup = (message) => {
-		if (popup === "") setTimeout(() => setPopup(""), 3000);
-		setPopup(message);
+		if (popup === "") setTimeout(() => dispatch({ type: "POPUP", value: "" }), 3000);
+		dispatch({ type: "POPUP", value: message });
 	};
 
 	// Render
@@ -110,25 +35,17 @@ function Menu(props) {
 		);
 	}
 	else if (menus.length === 0) {
-		return (
-			<MenuContext.Provider value={{admin, name, description, popup, createPopup, updateMenus, handleName, handleDescription}}>
-				<AddMenu id={"add-" + id} />
-			</MenuContext.Provider>
-		);
+		return <AddMenu id={"add-" + id} />
 	}
 	else {
-		const menu = menus[selectedMenu];
 		const editMode = (admin && (!menu._id || editId === menu._id));
 		const newSection = (newId === menu._id);
 
-		const editMenu = () => {
-			editResource(menu);
-		};
 		const saveMenu = () => {
 			if (!admin) return;
 			
 			if (!name) {
-				console.log("Name is required.");
+				createPopup("Name is required.");
 				return;
 			}
 	
@@ -137,11 +54,11 @@ function Menu(props) {
 					name,
 					description,
 				})
-				.then(result => updateMenus())
+				.then(result => dispatch({ type: "UPDATE_MENUS" }))
 				.catch(err => console.log(err));
 			}
 	
-			cancelEdit();
+			dispatch({ type: "CANCEL_EDIT" });
 		};
 		const removeMenu = () => {
 			let confirmed = window.confirm("Are you sure you want to remove this menu?\nThis will also remove all sections and items in the menu.");
@@ -149,29 +66,14 @@ function Menu(props) {
 	
 			if (menu._id) {
 				axios.delete('http://localhost:2000/menu/' + menu._id)
-				.then(result => updateMenus())
+				.then(result => dispatch({ type: "UPDATE_MENUS" }))
 				.catch(err => console.log(err));
 			}
 	
-			cancelEdit();
+			dispatch({ type: "CANCEL_EDIT" });
 		};
 		const addSection = () => {
-			addResource(menu._id);
-		};
-		const moveItemToSection = (itemId, oldSectionId, newSectionId) => {
-			const oldSection = menu.sections.find(section => section._id === oldSectionId);
-			const newSection = menu.sections.find(section => section._id === newSectionId);
-			const item = oldSection.items.find(i => i._id === itemId);
-			const oldItems = oldSection.items.filter(item => item._id !== itemId);
-			const newItems = (newSection.items) ? [...newSection.items, item] : [item];
-
-			axios.put('http://localhost:2000/menu/section/' + newSection._id, {items: newItems})
-			.then(result => {
-				axios.put('http://localhost:2000/menu/section/' + oldSection._id, {items: oldItems})
-				.then(result => updateMenus())
-				.catch(err => console.log(err));
-			})
-			.catch(err => console.log(err));
+			if (admin) dispatch({ type: "ADD_RESOURCE", value: menu._id });
 		};
 
 		// Render
@@ -181,25 +83,65 @@ function Menu(props) {
 	
 			return (
 				<header className={id + "-header"}>
-					<ActionButton id={id + "-edit"} action="edit" callback={editMenu} hide={(!admin || editMode)} />
-					<TextInput id={id + "-name"} update={handleName} value={nameInput} placeholder="Name..." edit={editMode} />
-					<TextInput id={id + "-description"} update={handleDescription} value={descriptionInput} placeholder="Description..." edit={editMode} />
-					<ConfirmBar id={id + "-confirm"} cancel={cancelEdit} confirm={saveMenu} hide={!editMode} />
+					<ActionButton
+						id={id + "-edit"}
+						action="edit"
+						callback={() => dispatch({ type: "EDIT_RESOURCE", value: menu })}
+						hide={(!admin || editMode)}
+					/>
+					<TextInput
+						id={id + "-name"}
+						update={(e) => dispatch({ type: "HANDLE_INPUT", field: "name", value: e.target.value })}
+						value={nameInput}
+						placeholder="Name..."
+						edit={editMode}
+					/>
+					<TextInput
+						id={id + "-description"}
+						update={(e) => dispatch({ type: "HANDLE_INPUT", field: "description", value: e.target.value })}
+						value={descriptionInput}
+						placeholder="Description..."
+						edit={editMode}
+					/>
+					<ConfirmBar
+						id={id + "-confirm"}
+						cancel={() => dispatch({ type: "CANCEL_EDIT" })}
+						confirm={saveMenu}
+						hide={!editMode}
+					/>
 				</header>
 			);
 		};
 		const renderSections = () => {
-			if (menu.sections) {
-				return menu.sections.map((section, index) =>
-					(admin || (section.items && section.items.length > 0))
-						? <MenuSection key={index} id={id + "__section"} index={index} section={section} parentId={menu._id} parentEditMode={editMode} />
-						: null
-				);
+			if (!menu.sections) return null;
+			
+			return menu.sections.map((section, index) => {
+				if (admin || (section.items && section.items.length > 0)) {
+					return (
+						<MenuSection
+							key={index}
+							id={id + "__section"}
+							index={index}
+							section={section}
+							parentId={menu._id}
+							parentEditMode={editMode}
+						/>
+					);
+				}
+				else return null;
 			}
-			else return null;
+			);
 		};
 		const renderNewSection = () => {
-			if (admin && newSection) return <MenuSection id={id + "__section"} section={{}} parentId={menu._id} />
+			if (admin && newSection) {
+				return (
+					<MenuSection
+						id={id + "__section"}
+						section={{}}
+						parentId={menu._id}
+					/>
+				);
+			}
 			else return null;
 		};
 		const renderFooter = () => {
@@ -207,26 +149,31 @@ function Menu(props) {
 	
 			return (
 				<footer className={id + "-footer"}>
-					<ActionButton id={id + "-remove"} action="remove" callback={removeMenu} hide={!editMode} />
-					<OpenClose id={id + "-add"} close={cancelEdit} open={addSection} isOpen={newSection} hide={editMode} />
+					<ActionButton
+						id={id + "-remove"}
+						action="remove"
+						callback={removeMenu}
+						hide={!editMode}
+					/>
+					<OpenClose
+						id={id + "-add"}
+						close={dispatch({ type: "CANCEL_EDIT" })}
+						open={addSection}
+						isOpen={newSection}
+						hide={editMode}
+					/>
 				</footer>
 			);
 		};
 
 		return (
-			<MenuContext.Provider value={{
-				admin, menu, name, description, price, editId, newId,
-				updateMenus, addToOrder, createPopup, addResource, editResource, cancelEdit, moveResource, moveItemToSection,
-				handleName, handleDescription, handlePrice,
-			}}>
-				<main className={id}>
-					{renderHeader()}
-					{renderSections()}
-					{renderNewSection()}
-					{renderFooter()}
-					<Popup id={id + "-popup"} value={popup} />
-				</main>
-			</MenuContext.Provider>
+			<main className={id}>
+				{renderHeader()}
+				{renderSections()}
+				{renderNewSection()}
+				{renderFooter()}
+				<Popup id={id + "-popup"} value={popup} />
+			</main>
 		);
 	}
 }

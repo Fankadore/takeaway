@@ -9,25 +9,21 @@ import TextInput from '../../components/TextInput/TextInput';
 import ActionButton from '../../components/ActionButton/ActionButton';
 import OpenClose from '../../components/OpenClose/OpenClose';
 
-import MenuContext from '../../context/MenuContext';
+import { menuContext } from '../../context/MenuContext';
 
-function MenuSection(props) {
+const MenuSection = (props) => {
 	const { id, index, section, parentId, parentEditMode } = props;
-	const context = useContext(MenuContext);
-	const { admin, menu, editId, newId, name, description } = context;
-	const { updateMenus, createPopup, addResource, editResource, cancelEdit, moveResource, moveItemToSection, handleName, handleDescription } = context;
+	const { state, dispatch, menu, moveSection, moveItemToSection } = useContext(menuContext);
+	const { admin, menus, editId, newId, name, description } = state;
 
 	const editMode = (admin && (!section._id || editId === section._id));
 	const newItem = (newId === section._id);
 
-	const editSection = () => {
-		editResource(section);
-	};
 	const saveSection = () => {
 		if (!admin) return;
 
 		if (!name) {
-			createPopup("Name is required.");
+			dispatch({ type: "POPUP", value: "Name is required." });
 			return;
 		}
 
@@ -37,7 +33,7 @@ function MenuSection(props) {
 				name,
 				description,
 			})
-			.then(result => updateMenus())
+			.then(result => dispatch({ type: "UPDATE_MENUS" }))
 			.catch(err => console.log(err));
 		}
 		else {
@@ -47,34 +43,27 @@ function MenuSection(props) {
 				name,
 				description,
 			})
-			.then(result => updateMenus())
+			.then(result => dispatch({ type: "UPDATE_MENUS" }))
 			.catch(err => console.log(err));
 		}
 
-		cancelEdit();
+		dispatch({ type: "CANCEL_EDIT" });
 	};
 	const removeSection = () => {
-		
 		if (section._id) {
 			let confirmed = window.confirm("Are you sure you want to remove this section?\nThis will also remove all items in the section.");
 			if (!confirmed) return;
 			
 			axios.delete('http://localhost:2000/menu/section/' + section._id)
-			.then(result => updateMenus())
+			.then(result => dispatch({ type: "UPDATE_MENUS" }))
 			.catch(err => console.log(err));
 		}
 
-		cancelEdit();
+		dispatch({ type: "CANCEL_EDIT" });
 	};
-	const moveSection = (startIndex, endIndex) => {
-		const sections = moveResource(menu.sections, startIndex, endIndex);
 
-		axios.put('http://localhost:2000/menu/' + parentId, {sections})
-		.then(result => updateMenus())
-		.catch(err => console.log(err));
-	};
 	const addItem = () => {
-		addResource(section._id);
+		dispatch({ type: "ADD_RESOURCE", value: section._id });
 	};
 
 	const onDragStart = (e) => {
@@ -96,13 +85,13 @@ function MenuSection(props) {
 		if (type === "section") {
 			const startIndex = e.dataTransfer.getData("index");
 			const endIndex = index;
-			moveSection(startIndex, endIndex);
+			moveSection(menu, startIndex, endIndex);
 		}
 		else if (type === "item") {
 			const sectionId = e.dataTransfer.getData("parentId");
 			if (sectionId !== section._id) {
 				const itemId = e.dataTransfer.getData("id");
-				moveItemToSection(itemId, sectionId, section._id);
+				moveItemToSection(menu, itemId, sectionId, section._id);
 			}
 		}
 	};
@@ -114,21 +103,65 @@ function MenuSection(props) {
 
 		return (
 			<header className={id + "-header"}>
-				<ActionButton id={id + "-edit"} action="edit" callback={editSection} hide={(!admin || editMode || parentEditMode)} />
-				<TextInput id={id + "-name"} update={handleName} value={nameInput} placeholder="Name..."  edit={editMode} />
-				<TextInput id={id + "-description"} update={handleDescription} value={descriptionInput} placeholder="Description..."  edit={editMode} />
-				<ActionButton id={id + "-move"} action="move" callback={onDragStart} hide={!parentEditMode} />
-				<ConfirmBar id={id + "-confirm"} cancel={cancelEdit} confirm={saveSection} hide={!editMode} />
+				<ActionButton
+					id={id + "-edit"}
+					action="edit"
+					callback={() => dispatch({ type: "EDIT_RESOURCE", value: section })}
+					hide={(!admin || editMode || parentEditMode)}
+				/>
+				<TextInput
+					id={id + "-name"}
+					update={(e) => dispatch({ type: "HANDLE_INPUT", field: "name", value: e.target.value})}
+					value={nameInput}
+					placeholder="Name..."
+					edit={editMode}
+				/>
+				<TextInput
+					id={id + "-description"}
+					update={(e) => dispatch({ type: "HANDLE_INPUT", field: "description", value: e.target.value})}
+					value={descriptionInput}
+					placeholder="Description..."
+					edit={editMode}
+				/>
+				<ActionButton
+					id={id + "-move"}
+					action="move"
+					callback={onDragStart}
+					hide={!parentEditMode}
+				/>
+				<ConfirmBar
+					id={id + "-confirm"}
+					cancel={() => dispatch({ type: "CANCEL_EDIT" })}
+					confirm={saveSection}
+					hide={!editMode}
+				/>
 			</header>
 		);
 	};
 	const renderItems = () => {
-		if (section.items) return section.items.map((item, index) => <MenuItem key={index} index={index} id={id + "__item"} item={item} parentId={section._id} parentEditMode={editMode || parentEditMode} />)
-		else return null;
+		if (!section.items) return null;
+		return section.items.map((item, index) => {
+			return (
+				<MenuItem
+					key={index}
+					index={index}
+					id={id + "__item"}
+					item={item}
+					parentId={section._id}
+					parentEditMode={editMode || parentEditMode}
+				/>
+			);
+		});
 	};
 	const renderNewItem = () => {
-		if (admin && newItem) return <MenuItem id={id + "__item"} item={{}} parentId={section._id} />
-		else return null;
+		if (!admin || !newItem) return null;
+		return (
+			<MenuItem
+				id={id + "__item"}
+				item={{}}
+				parentId={section._id}
+			/>
+		);
 	};
 	const renderFooter = () => {
 		if (!admin) return null;
@@ -137,7 +170,7 @@ function MenuSection(props) {
 			return (
 				<footer className={id + "-footer"}>
 					<ActionButton id={id + "-remove"} action="remove" callback={removeSection} hide={!editMode} />
-					<OpenClose id={id + "-add"} close={cancelEdit} open={addItem} isOpen={newItem} hide={editMode} />
+					<OpenClose id={id + "-add"} close={() => dispatch({ type: "CANCEL_EDIT" })} open={addItem} isOpen={newItem} hide={editMode} />
 				</footer>
 			);
 		}

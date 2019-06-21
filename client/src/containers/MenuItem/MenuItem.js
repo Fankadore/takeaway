@@ -7,24 +7,47 @@ import ConfirmBar from '../../components/ConfirmBar/ConfirmBar';
 import PriceInput from '../../components/PriceInput/PriceInput';
 import TextInput from '../../components/TextInput/TextInput';
 
-import MenuContext from '../../context/MenuContext';
+import { menuContext } from '../../context/MenuContext';
 
-function MenuItem(props) {
+const MenuItem = (props) => {
 	const { id, index, item, parentId, parentEditMode } = props;
-	const context = useContext(MenuContext);
-	const { admin, menu, editId, name, description, price } = context;
-	const { updateMenus, createPopup, addToOrder, moveResource, editResource, cancelEdit, moveItemToSection, handleName, handleDescription, handlePrice } = context;
+	const { state, dispatch, moveItemToSection } = useContext(menuContext);
+	const { admin, menu, editId, name, description, price } = state;
 
 	const editMode = (admin && (!item._id || editId === item._id));
+
+	const moveResource = (array, startIndex, endIndex) => {
+		startIndex = parseInt(startIndex);
+		endIndex = parseInt(endIndex);
 	
-	const editItem = () => {
-		editResource(item);
+		if (startIndex < endIndex) {
+			if (startIndex < 0 || endIndex <= 0) return;
+	
+			while (startIndex < endIndex) {
+				const temp = array[startIndex + 1];
+				array[startIndex + 1] = array[startIndex];
+				array[startIndex] = temp;
+				startIndex++;
+			}
+		}
+		else if (startIndex > endIndex) {
+			if (startIndex <= 0 || endIndex < 0) return;
+			while (startIndex > endIndex) {
+				const temp = array[startIndex - 1];
+				array[startIndex - 1] = array[startIndex];
+				array[startIndex] = temp;
+				startIndex--;
+			}
+		}
+	
+		return array;
 	};
+
 	const saveItem = () => {
 		if (!admin) return;
 
 		if (!name) {
-			createPopup("Name is required.");
+			dispatch({ type: "POPUP", value: "Name is required." });
 			return;
 		}
 		
@@ -35,7 +58,7 @@ function MenuItem(props) {
 				price,
 				description,
 			})
-			.then(result => updateMenus())
+			.then(result => dispatch({ type: "UPDATE_MENUS" }))
 			.catch(err => console.log(err));
 		}
 		else {
@@ -46,11 +69,11 @@ function MenuItem(props) {
 				price,
 				description,
 			})
-			.then(result => updateMenus())
+			.then(result => dispatch({ type: "UPDATE_MENUS" }))
 			.catch(err => console.log(err));
 		}
 
-		cancelEdit();
+		dispatch({ type: "CANCEL_EDIT" });
 	};
 	const removeItem = () => {
 		if (item._id) {
@@ -58,17 +81,17 @@ function MenuItem(props) {
 			if (!confirmed) return;
 			
 			axios.delete('http://localhost:2000/menu/item/' + item._id)
-			.then(result => updateMenus())
+			.then(result => dispatch({ type: "UPDATE_MENUS" }))
 			.catch(err => console.log(err));
 		}
 
-		cancelEdit();
+		dispatch({ type: "CANCEL_EDIT" });
 	};
 	const moveItem = (startIndex, endIndex) => {
 		const section = menu.sections.find((element) => element._id === parentId);
 		const items = moveResource(section.items, startIndex, endIndex);
 		axios.put('http://localhost:2000/menu/section/' + parentId, {items})
-		.then(result => updateMenus())
+		.then(result => dispatch({ type: "UPDATE_MENUS" }))
 		.catch(err => console.log(err));
 	};
 
@@ -97,7 +120,7 @@ function MenuItem(props) {
 			}
 			else {
 				const itemId = e.dataTransfer.getData("id");
-				moveItemToSection(itemId, sectionId, parentId);
+				moveItemToSection(menu, itemId, sectionId, parentId);
 			}
 		}
 	};
@@ -106,8 +129,8 @@ function MenuItem(props) {
 	const renderActionButton = () => {
 		if (editMode) return <ActionButton id={id + "-remove"} action="remove" callback={removeItem} />
 		else if (parentEditMode) return <ActionButton id={id + "-move"} action="move" callback={onDragStart} />
-		else if (admin) return <ActionButton id={id + "-edit"} action="edit" callback={editItem} />
-		else return <ActionButton id={id + "-add"} action="add" callback={addToOrder} />
+		else if (admin) return <ActionButton id={id + "-edit"} action="edit" callback={() => dispatch({ type: "EDIT_RESOURCE", value: item })} />
+		else return <ActionButton id={id + "-add"} action="add" callback={() => dispatch({ type: "ADD_TO_ORDER" })} />
 	};
 
 	const nameInput = (editMode) ? name : item.name;
@@ -116,11 +139,34 @@ function MenuItem(props) {
 
 	return (
 		<section className={id} onDragOver={onDragOver} onDrop={onDrop}>
-			<TextInput id={id + "-name"} update={handleName} value={nameInput} placeholder="Name..."  edit={editMode} />
-			<PriceInput id={id + "-price"} update={handlePrice} value={priceInput} currency="£" edit={editMode} />
-			<TextInput id={id + "-description"} update={handleDescription} value={descriptionInput} placeholder="Description..." edit={editMode} />
+			<TextInput
+				id={id + "-name"}
+				update={(e) => dispatch({ type: "HANDLE_INPUT", field: "name", value: e.target.value})}
+				value={nameInput}
+				placeholder="Name..."
+				edit={editMode}
+			/>
+			<PriceInput
+				id={id + "-price"}
+				update={(e) => dispatch({ type: "HANDLE_PRICE", value: e.target.value })}
+				value={priceInput}
+				currency="£"
+				edit={editMode}
+			/>
+			<TextInput
+				id={id + "-description"}
+				update={(e) => dispatch({ type: "HANDLE_INPUT", field: "description", value: e.target.value})}
+				value={descriptionInput}
+				placeholder="Description..."
+				edit={editMode}
+			/>
 			{renderActionButton()}
-			<ConfirmBar id={id + "-confirm"} confirm={saveItem} cancel={cancelEdit} hide={!editMode} />
+			<ConfirmBar
+				id={id + "-confirm"}
+				confirm={saveItem}
+				cancel={() => dispatch({ type: "CANCEL_EDIT"})}
+				hide={!editMode}
+			/>
 		</section>
 	);
 }

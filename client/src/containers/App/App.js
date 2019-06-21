@@ -11,25 +11,25 @@ import Nav from '../../components/Nav/Nav';
 import Footer from '../../components/Footer/Footer';
 
 import content from '../../data/content';
+import MenuContext from '../../context/MenuContext';
 
 function App(props) {
 	const [admin, setAdmin] = useState(true);
 	const [selectedLocation, setSelectedLocation] = useState(0);
-
-	const addToOrder = (itemId) => {
-
-	};
 
 	// Render
 	const renderHome = () => {
 		return <Home />
 	};
 	const renderMenu = () => {
-		return <Menu id="menu" addToOrder={addToOrder} admin={admin} />
+		return (
+			<MenuContext>
+				<Menu id="menu" admin={admin} />
+			</MenuContext>
+		)
 	};
 	const renderFindUs = () => {
 		const { locations } = content;
-
 		return <FindUs location={locations[selectedLocation]} />
 	};
 
