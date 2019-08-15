@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
+
 const Menu = require('../models/Menu.js');
 const MenuSection = require('../models/MenuSection.js');
 const MenuItem = require('../models/MenuItem.js');
 
-const getMenus = async (req, res, next) => {
+const getMenus = (req, res, next) => {
 	Menu.find()
 	.populate({
 		path: 'sections',
@@ -16,7 +17,7 @@ const getMenus = async (req, res, next) => {
 	.catch(err => res.status(500).json(err));
 };
 
-const addMenu = async (req, res, next) => {
+const addMenu = (req, res, next) => {
 	const { name, description = "", sections = [] } = req.body;
 
 	if (!name) {
@@ -25,7 +26,6 @@ const addMenu = async (req, res, next) => {
 	}
 
 	const menu = new Menu({
-		_id: new mongoose.Types.ObjectId,
     name,
 		description,
 		sections,
@@ -36,14 +36,14 @@ const addMenu = async (req, res, next) => {
 	.catch(err => res.status(500).json(err));
 };
 
-const updateMenu = async (req, res, next) => {
-  Menu.updateOne({ _id: req.params.id }, { $set: req.body }).exec()
-  .then(menu => res.status(200).json(menu))
+const updateMenu = (req, res, next) => {
+	Menu.updateOne({ _id: req.params.menuId }, { $set: req.body }).exec()
+	.then(menu => res.status(200).json(menu))
 	.catch(err => res.status(500).json(err));
 };
 
 const removeMenu = async (req, res, next) => {
-	const menuId = req.params.id;
+	const menuId = req.params.menuId;
 	let menu = await Menu.findById(menuId).exec();
 	let sectionIds = menu.sections;
 	let sections = await MenuSection.find({_id: {$in: sectionIds}}).exec();
@@ -73,7 +73,13 @@ const removeMenu = async (req, res, next) => {
 };
 
 const addSection = async (req, res, next) => {
-	const { name, description = "", items = [], menuId } = req.body;
+	const { menuId } = req.params;
+	const { name, description = "", items = [] } = req.body;
+	
+	if (!name) {
+		res.status(500).json({err: "Name is required."});
+		return;
+	}
 
 	let menu = await Menu.findById(menuId).exec();
 	if (!menu) {
@@ -81,27 +87,20 @@ const addSection = async (req, res, next) => {
 		return;
 	}
 
-	if (!name) {
-		res.status(500).json({err: "Name is required."});
-		return;
-	}
-
 	const menuSection = new MenuSection({
-		_id: new mongoose.Types.ObjectId,
-    name,
+  	name,
 		description,
 		items,
   });
 
-	let result = await menuSection.save();
-	if (!result) {
+	let saveSection = await menuSection.save();
+	if (!saveSection) {
 		res.status(500).json({err: "Failed to save menu section."});
 		return;
 	}
 
-	const sectionIds = menu.sections.map(section => section._id);
-	sectionIds.push(menuSection._id);
-	let menuUpdate = await menu.updateOne({sections: sectionIds});
+	const sectionIds = [...menu.sections, menuSection._id];
+	let menuUpdate = await Menu.updateOne({ _id: menu._id}, {sections: sectionIds});
 	if (!menuUpdate) {
 		res.status(500).json({err: "Failed to add section to menu."});
 		return;
@@ -110,36 +109,58 @@ const addSection = async (req, res, next) => {
 	res.status(201).json(menuSection);
 };
 
-const updateSection = async (req, res, next) => {
-  MenuSection.updateOne({ _id: req.params.id }, { $set: req.body }).exec()
+const updateSection = (req, res, next) => {
+  MenuSection.updateOne({ _id: req.params.sectionId }, { $set: req.body }).exec()
   .then(menuSection => res.status(200).json(menuSection))
 	.catch(err => res.status(500).json(err));
 };
 
 const removeSection = async (req, res, next) => {
-	const sectionId = req.params.id;
-	let section = await MenuSection.findById(sectionId).exec();
-	const itemIds = section.items;
+	const { menuId, sectionId } = req.params;
+	
+	// Check for other instances of this section
+	let menus = await Menu.find().exec();
+	const sectionCount = menus.filter(menu => (menu.sections.indexOf(sectionId) > -1));
+	if (sectionCount.length === 0) {
+		res.status(404).json({err: "No section found with id " + sectionId});
+		return;
+	}
+	else if (sectionCount.length === 1) {
+		// Check for other instances of these items
+		let section = await MenuSection.findById(sectionId);
+		let sections = await MenuSection.find().exec();
+		for (let i = 0; i < section.items.length; i++) {
+			const itemId = section.items[i];
+			const itemCount = sections.filter(section => section.items.indexOf(itemId) > -1);
 
-	if (itemIds && itemIds.length > 0) {
-		let success = MenuItem.deleteMany({_id: {$in: itemIds}}).exec();
-		if (!success) {
-			res.status(500).json({err: "Failed to remove all menu items."});
+			if (itemCount < 2) {
+				let itemDeleted = await MenuItem.deleteOne({ _id: itemId }).exec();
+				if (!itemDeleted) {
+					res.status(500).json({err: "Failed to delete item " + itemId});
+					return;
+				}
+			}
+		}
+
+		let sectionDeleted = await MenuSection.deleteOne({ _id: sectionId }).exec();
+		if (!sectionDeleted) {
+			res.status(500).json({err: "Failed to delete section " + sectionId});
 			return;
 		}
 	}
 
-	let deleteSection = await MenuSection.deleteOne({ _id: sectionId }).exec()
-	if (!deleteSection) {
-		res.status(500).json({err: "Failed to remove menu section."});
-		return;
-	}
+	// Remove Section from Menu
+	let menu = await Menu.findById(menuId).exec();
+	const updatedSections = menu.sections.filter(id => ""+id !== ""+sectionId);
+	let menuSaved = await Menu.updateOne({ _id: menu._id }, { sections: updatedSections }).exec();
 
-	res.status(200).json({success: true});
+	if (menuSaved) res.status(200).json({success: true});
+	else res.status(500).json({err: "Failed to remove section from menu"});
 };
 
 const addItem = async (req, res, next) => {
-	const { name, price = 0, description = "", sectionId } = req.body;
+	const { sectionId } = req.params;
+	const { name, price = 0, description = "" } = req.body;
 	
 	let section = await MenuSection.findById(sectionId).exec();
 	if (!section) {
@@ -153,7 +174,6 @@ const addItem = async (req, res, next) => {
 	}
 
 	const menuItem = new MenuItem({
-		_id: new mongoose.Types.ObjectId,
     name,
     price,
 		description,
@@ -176,33 +196,34 @@ const addItem = async (req, res, next) => {
 	res.status(201).json(menuItem);
 };
 
-const updateItem = async (req, res, next) => {
-	return MenuItem.updateOne({ _id: req.params.id }, { $set: req.body }).exec()
+const updateItem = (req, res, next) => {
+	MenuItem.updateOne({ _id: req.params.itemId }, { $set: req.body }).exec()
   .then(result => res.status(200).json(result))
 	.catch(err => res.status(500).json(err));
 };
 
 const removeItem = async (req, res, next) => {
-	const { id } = req.params;
+	const { sectionId, itemId } = req.params;
 	
-	let menuItem = await MenuItem.findById(id).exec();
-	if (!menuItem) {
-		res.status(404).json({err: "No menu item found with that Id"});
+	let sections = await MenuSection.find().exec();
+	const itemCount = sections.filter(section => (section.items.indexOf(itemId) > -1));
+	if (itemCount.length === 0) {
+		res.status(404).json({err: "No item found with id " + itemId});
 		return;
 	}
-
-	let sections = await MenuSection.find({items: id}).exec();
-	if (sections.length > 0) {
-		sections.forEach(section => {
-			const itemList = section.items.map(item => item._id);
-			const newItemList = itemList.filter(itemId => itemId !== id);
-			section.updateOne({items: newItemList});
-		});
+	else if (itemCount.length === 1) {
+		let itemDeleted = await MenuItem.deleteOne({ _id: itemId }).exec();
+		if (!itemDeleted) {
+			res.status(500).json({err: "Failed to delete item " + itemId});
+			return;
+		}
 	}
+	let section = await MenuSection.findById(sectionId).exec();
+	const updatedItems = section.items.filter(id => ""+id !== ""+itemId);
+	let sectionSaved = await MenuSection.updateOne({ _id: sectionId }, { items: updatedItems }).exec();
 
-	let result = await MenuItem.deleteOne({_id: id}).exec();
-	if (result) res.status(200).json({});
-	else res.status(500).json({err: "Failed to remove menu item."});
+	if (sectionSaved) res.status(200).json({success: true});
+	else res.status(500).json({err: "Failed to remove item from section"});
 };
 
 module.exports = {
