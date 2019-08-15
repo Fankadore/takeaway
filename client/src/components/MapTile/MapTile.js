@@ -2,9 +2,7 @@ import React, { useEffect } from 'react';
 import L from 'leaflet';
 import './MapTile.scss';
 
-function MapTile(props) {
-	const { id, latlng } = props;
-
+function MapTile({ id, latlng }) {
 	const loadMap = () => {
 		const osm = L.map(id, {
 			center: latlng,
@@ -15,15 +13,15 @@ function MapTile(props) {
 				L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 					attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
 				}),
-			]
+			],
 		});
 
 		L.marker(latlng).addTo(osm);
 	};
+	
+	useEffect(loadMap, []);
 
-	useEffect(loadMap);
-
-	return <div id={id} className="find-us__map" />
+	return <div id={id} className={id + "__map map"} />
 }
 
 export default MapTile;
