@@ -1,16 +1,14 @@
 import React from 'react';
 import './Popup.scss';
 
-function PopUp(props) {
-	const { id, value } = props;
-
-	if (!value) return null;
+const Popup = ({ id, message }) => {
+	if (!message) return null;
 	
 	return (
 		<div id={id} className="popup">
-			{value}
+			{message}
 		</div>
 	);
-}
+};
 
-export default PopUp;
+export default Popup;
