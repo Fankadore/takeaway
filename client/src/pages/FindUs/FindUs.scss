@@ -7,9 +7,10 @@
 	padding: 0.5rem;
 
 	display: grid;
+	grid-template-columns: auto 1fr auto;
 	grid-template-areas:
-		"address"
-		"map";
+		"previous address next"
+		"map			map			map";
 	
 	&__address {
 		grid-area: address;
@@ -31,5 +32,19 @@
 		width: 300px;
 		margin: 0.5rem auto;
 		border: 3px solid $brand1;
+	}
+
+	&__previous {
+		grid-area: previous;
+		font-size: 2rem;
+		color: $brand1;
+		margin: 2rem;
+	}
+	
+	&__next {
+		grid-area: next;
+		font-size: 2rem;
+		color: $brand1;
+		margin: 2rem;
 	}
 }

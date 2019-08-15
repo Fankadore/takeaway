@@ -4,7 +4,7 @@
 	grid-area: main;
 	background-color: $light;
 	color: $dark;
-	
+
 	&--flex {
 		display: flex;
 		flex-direction: column;
@@ -12,7 +12,7 @@
 		align-items: center;
 	}
 
-	&-header {
+	&__header {
 		padding: 0.5rem;
 		display: grid;
 		grid-template-columns: 2rem 1fr 2rem;
@@ -21,7 +21,8 @@
 			".				desc		."
 			"confirm	confirm confirm";
 	}
-	&-footer {
+
+	&__footer {
 		padding: 0.5rem;
 		display: grid;
 		grid-template-columns: 2rem 1fr 2rem;
@@ -29,50 +30,100 @@
 			"remove . add";
 	}
 	
-	&-name {
+	&__name {
 		grid-area: name;
 		text-align: center;
 		font-family: 'Open Sans', sans-serif;
 		font-size: x-large;
 		font-weight: bold;
 	}
-	&-description {
+
+	&__description {
 		grid-area: desc;
 		text-align: center;
 		font-family: 'Open Sans', sans-serif;
 		font-size: small;
 	}
 
-	&-edit {
+	&__edit {
 		grid-area: edit;
 		color: $brand2;
 	}
-	&-remove {
+
+	&__remove {
 		grid-area: remove;
 		color: $brand2;
 	}
-	&-add {
+
+	&__add {
 		grid-area: add;
 		color: $brand2;
 	}
-	&-confirm {
+
+	&__confirm {
 		grid-area: confirm;
 		color: $brand2;
 		margin: 0.5rem;
 	}
-	
-	&-load {
-		background-color: $brand1;
-		background-image: linear-gradient($brand1, $brand2);
-		font-family: monospace;
-		color: #fff;
-	}
 
-	&-popup {
+	&__popup {
 		position: fixed;
 		top: 0;
 		width: 100%;
 		background-color: $fail;
 		color: #fff;
+	}
+}
+
+.menu-add {
+	grid-area: main;
+	display: grid;
+	grid-template-rows: 0.5fr auto auto 0.5fr auto auto 1fr 0.5fr;
+	grid-gap: 0.5rem;
+	grid-template-areas:
+		"."
+		"name"
+		"desc"
+		"."
+		"button"
+		"text"
+		"popup"
+		".";
+	
+	&__not-found {
+		text-align: center;
+	}
+
+	&__text {
+		grid-area: text;
+		text-align: center;
+		font-weight: bold;
+		margin: auto;
+	}
+
+	&__icon {
+		grid-area: button;
+		text-align: center;
+		font-size: 3rem;
+		color: $brand2;
+		margin: auto;
+	}
+
+	&__name {
+		grid-area: name;
+		text-align: center;
+		font-family: 'Open sans', sans-serif;
+		font-size: large;
+		font-weight: bold;
+	}
+	
+	&__description {
+		grid-area: desc;
+		text-align: center;
+		font-family: 'Open sans', sans-serif;
+	}
+	
+	&__popup {
+		grid-area: popup; 
 	}
 }

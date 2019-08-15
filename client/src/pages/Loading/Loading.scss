@@ -1,0 +1,16 @@
+@import '../../variables.scss';
+
+.loading {
+	grid-area: main;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	
+	&__spinner {
+		background-color: $brand1;
+		background-image: linear-gradient($brand1, $brand2);
+		font-family: monospace;
+		color: #fff;
+	}
+}
