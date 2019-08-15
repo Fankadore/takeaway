@@ -4,16 +4,17 @@ const menuController = require('../controllers/menuController.js');
 const router = express.Router();
 
 router.get('/', menuController.getMenus);
+
 router.post('/', menuController.addMenu);
-router.put('/:id', menuController.updateMenu);
-router.delete('/:id', menuController.removeMenu);
+router.delete('/:menuId', menuController.removeMenu);
+router.put('/:menuId', menuController.updateMenu);
 
-router.post('/section', menuController.addSection);
-router.put('/section/:id', menuController.updateSection);
-router.delete('/section/:id', menuController.removeSection);
+router.post('/:menuId/section', menuController.addSection);
+router.delete('/:menuId/section/:sectionId', menuController.removeSection);
+router.put('/section/:sectionId', menuController.updateSection);
 
-router.post('/item', menuController.addItem);
-router.put('/item/:id', menuController.updateItem);
-router.delete('/item/:id', menuController.removeItem);
+router.post('/section/:sectionId/item', menuController.addItem);
+router.delete('/section/:sectionId/item/:itemId', menuController.removeItem);
+router.put('/item/:itemId', menuController.updateItem);
 
 module.exports = router;
